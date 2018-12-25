@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+
+        <script type="text/javascript" language="javascript">
+            var mqtt;
+            var reconnectTimeout=2000;
+            var host="192.168.0.116";//broker adress
+            var port=1884;//port of the broker
+            function onConnect() {
+                //once a connection has been made, make a subscription and sen a message
+                console.log("Connected");
+                //mqtt.subscribe("sensor1");
+              // sendMessage("sensor1","holamundo");
+            }
+        
+            function MQTTconnect() {
+                console.log("connectiong to "+ host+" "+port);
+                mqtt=new Paho.MQTT.Client(host,port,"clientjs");
+                var options={
+                    timeout: 3,
+                    onSuccess: onConnect,//function executed when de conncetion scceed 
+                    onFailure: onFailure,//function executed when the conecction fail
+                };
+        
+                //mqtt.onConnectionLost = onConnectionLost;
+                //mqtt.onMessageArrived = onMessageArrived;
+                //mqtt.onConnected = onConnected;
+        
+                mqtt.connect(options);
+                
+            }
+        
+            function sendMessage(topic,payload){
+                //send payload to the topic
+                console.log("Sending "+payload+" to "+topic);
+                message=new Paho.MQTT.Message(payload);
+                message.destinationName=topic;
+                mqtt.send(message);
+            }
+        
+            function onFailure(message) {
+                console.log("Connection Attempt to Host "+host+"Failed");
+                setTimeout(MQTTconnect, reconnectTimeout);
+            }
+            function onMessageArrived(msg){
+                out_msg="Message received "+msg.payloadString+"<br>";
+                out_msg=out_msg+"Message received Topic "+msg.destinationName;
+                console.log(out_msg);
+        
+            }
+
+            function oopen(){
+                sendMessage("alarma/web",document.getElementById("myPsw").value)
+            }
+        
+        
+        </script>
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+
+.button {
+  background-color: #d3d3d3;
+  border: none;
+  color: rgb(0, 0, 0);
+  padding: 15px 40px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.menu {
+  float:left;
+  width:20%;
+  text-align:center;
+}
+.menu a {
+  background-color:#e5e5e5;
+  padding:8px;
+  margin-top:7px;
+  display:block;
+  width:100%;
+  color:black;
+}
+.main {
+  float:left;
+  width:60%;
+  padding:0 20px;
+}
+.right {
+  background-color:#e5e5e5;
+  float:left;
+  width:20%;
+  padding:15px;
+  margin-top:7px;
+  text-align:center;
+}
+
+@media only screen and (max-width:620px) {
+  /* For mobile phones: */
+  .menu, .main, .right {
+    width:100%;
+  }
+}
+</style>
+</head>
+<body style="font-family:Verdana;color:#aaaaaa;">
+
+<div style="background-color:#e5e5e5;padding:15px;text-align:center;">
+  <h1>Pierdominici IOT</h1>
+</div>
+
+<div style="overflow:auto">
+  <div class="menu">
+    <a href="index.html">Swimming Pool</a>
+    <a href="garage.html">Garage</a>
+    <a href="#">Alarm</a>
+
+  </div>
+
+  <div class="main">
+    <h2>Alarm</h2>
+    <input type="password" id="myPsw" value="psw123">
+
+    <button type="button" class="button" onclick="oopen()">
+            Send
+        </button>
+        
+
+  </div>
+
+  <div class="right">
+    <h2>About</h2>
+    <p>First version of resizable GUI.</p>
+  </div>
+</div>
+
+<div style="background-color:#e5e5e5;text-align:center;padding:10px;margin-top:7px;">© copyright ismetech.com.ar</div>
+
+<script>
+ 
+ MQTTconnect();
+   
+</script>
+
+</body>
+</html>
